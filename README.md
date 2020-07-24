@@ -9,6 +9,7 @@ This repository includes:
 3. `outputs_combined`: contains predictions combined by the combiner;
 4. `utils`: contains tools to calculate accuracies of combined results.
 
+(Scripts to build the models used in our experiments will be released latter.)
  
 ## Tested environment and dependencies
 1. Ubuntu 16.04
