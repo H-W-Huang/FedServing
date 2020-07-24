@@ -1,0 +1,29 @@
+enclave {
+	include "../aggregator.h"
+
+    trusted {
+        /* define ECALLs here. */
+
+		// very simple function - adding 2 numbers
+		public int combine_result([user_check] ModelInput *input, [out] CombinerOutput *output);
+
+	
+		// write to file
+		// public void write_to_file(void);	
+    
+		// // read from file
+		// public void read_from_file(void);
+    
+    };
+
+    untrusted {
+        /* define OCALLs here. */
+        void ocall_print([in, string]const char* str);
+    	/* TODO 2: Add ocalls */
+   	
+		// define ocalls for write to file and read from file
+		//void ocall_write_file([in, string] const char* filename, [in, size=buf_len] const char* buf, size_t buf_len);
+		//void ocall_read_file([in, string] const char* filename, [in, size=buf_len] char* buf, size_t buf_len);
+    };
+
+};
