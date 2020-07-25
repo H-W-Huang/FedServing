@@ -17,7 +17,7 @@ This repository includes:
 2. SGX SDK 2.5
 3. SGX PSW
 4. Pytorch 1.1.0
-5. Tensorflow 1.12.2
+5. TensorFlow 1.12.2
 
 
 ## Truth discovery
