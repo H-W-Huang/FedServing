@@ -1,7 +1,7 @@
 
 ## Intorduction
 
-The code for the FedServing paper. 
+The code of combiner to do **turth discovery** for the FedServing paper.
 
 This repository includes:
 1. `combiner_sgx`: contains program to do truth discovery in SGX;
