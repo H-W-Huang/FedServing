@@ -1,11 +1,11 @@
 
-## Intorduction
+## Introduction
 
-The code of combiner to do **turth discovery** for the FedServing paper.
+The code of combiner to do **truth discovery** for the FedServing paper.
 
 This repository includes:
-1. `combiner_sgx`: contains program to do truth discovery in SGX;
-2. `outputs`: contains predictions outputby participant models, stored as  `csv` files;
+1. `combiner_sgx`: contains the program to do truth discovery in SGX;
+2. `outputs`: contains predictions output by participant models, stored as  `csv` files;
 3. `outputs_combined`: contains predictions combined by the combiner;
 3. `image`: contains scripts to build models of task MNIST and ImageNet;
 3. `nlp`: contains scripts to build models of task 20News;
@@ -20,9 +20,9 @@ This repository includes:
 5. Tensorflow 1.12.2
 
 
-## Turth discovery
+## Truth discovery
 
-To do turth discovery, enter `combiner_sgx` and run the following command:
+To do truth discovery, enter `combiner_sgx` and run the following command:
 
 ```bash
 ./run.sh
@@ -68,17 +68,17 @@ Results combined! Exiting the enclave
 Combination takes 0.010545s
 Results are saved to ./../outputs_combined/combination_results_new/MNIST/noise_0/MNIST_4000_label_iter_16.csv
 ```
-After the turth discovery is done, results will be saved in `outputs_combined`，saved as `csv` file.
+After the truth discovery is done, results will be saved in `outputs_combined`，saved as `csv` file.
 
 
 Configuration can be found in `combiner_sgx/aggregator.h`. Please refer to the file to see the configurable fields.
 
 
-## Get turth discovery accuracies
+## Get truth discovery accuracies
 
-To get the turth discovery accuracy, a ground truth files should be prepared in advanced.
+To get the truth discovery accuracy, a ground truth file should be prepared in advance.
 
-We provide the ground truth files as well as the combined results used in our experiments in this repo. To obtain the accuracy, enter `utils` and run the follow commands.
+We provide the ground truth files as well as the combined results used in our experiments in this repo. To obtain the accuracy, enter `utils` and run the following commands.
 ``` bash
 python acc_utils.py
 ```
