@@ -7,14 +7,17 @@ This repository includes:
 1. `combiner_sgx`: contains program to do truth discovery in SGX;
 2. `outputs`: contains predictions outputby participant models, stored as  `csv` files;
 3. `outputs_combined`: contains predictions combined by the combiner;
+3. `image`: contains scripts to build models of task MNIST and ImageNet;
+3. `nlp`: contains scripts to build models of task 20News;
 4. `utils`: contains tools to calculate accuracies of combined results.
 
-(Scripts to build the models used in our experiments will be released latter.)
  
 ## Tested environment and dependencies
 1. Ubuntu 16.04
 2. SGX SDK 2.5
 3. SGX PSW
+4. Pytorch 1.1.0
+5. Tensorflow 1.12.2
 
 
 ## Turth discovery
@@ -53,16 +56,17 @@ Succeed.
 SIGN =>  enclave.signed.so
 Initialization takes 0.3644s
 Task:MNIST
-read data from: /home/user01/exps/PredictionMarket_open/outputs/MNIST/query_4000/type_label/KNN_noise.csv
-read data from: /home/user01/exps/PredictionMarket_open/outputs/MNIST/query_4000/type_label/SVM_noise.csv
-read data from: /home/user01/exps/PredictionMarket_open/outputs/MNIST/query_4000/type_label/CNN_noise.csv
-read data from: /home/user01/exps/PredictionMarket_open/outputs/MNIST/query_4000/type_label/RNN_noise.csv
-read data from: /home/user01/exps/PredictionMarket_open/outputs/MNIST/query_4000/type_label/LR_noise.csv
-read data from: /home/user01/exps/PredictionMarket_open/outputs/MNIST/query_4000/type_label/MLP.csv
+read data from: ../outputs/MNIST/query_4000/type_label/KNN.csv
+read data from: ../outputs/MNIST/query_4000/type_label/SVM.csv
+read data from: ../outputs/MNIST/query_4000/type_label/CNN.csv
+read data from: ../outputs/MNIST/query_4000/type_label/RNN.csv
+read data from: ../outputs/MNIST/query_4000/type_label/LR.csv
+read data from: ../outputs/MNIST/query_4000/type_label/MLP.csv
 Data reading takes 0.020489s
 Combining results inside enclave...
 Results combined! Exiting the enclave
 Combination takes 0.010545s
+Results are saved to ./../outputs_combined/combination_results_new/MNIST/noise_0/MNIST_4000_label_iter_16.csv
 ```
 After the turth discovery is done, results will be saved in `outputs_combined`，saved as `csv` file.
 

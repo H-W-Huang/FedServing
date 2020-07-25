@@ -449,7 +449,9 @@ int exp1(){
     if(DISTANCE == "KL"){
         saveResults( "" TASK "_" STR(QUERY_SIZE) "_" OTYPE "_iter_" STR(ITERATION_NUM) "_dis_" DISTANCE "_.csv", output.preds);
     }else{
-        saveResults( "./../outputs_combined/combination_results_new/" TASK "/noise_" STR(NOISE_LEVEL) "/" TASK "_" STR(QUERY_SIZE) "_" OTYPE "_iter_" STR(ITERATION_NUM) ".csv", output.preds);
+        string s_path = "./../outputs_combined/combination_results_new/" TASK "/noise_" STR(NOISE_LEVEL) "/" TASK "_" STR(QUERY_SIZE) "_" OTYPE "_iter_" STR(ITERATION_NUM) ".csv";
+        saveResults( s_path, output.preds);
+        cout << "Results are saved to " << s_path << endl;
     }
     // cout.rdbuf(coutbuf);
     return 0;
