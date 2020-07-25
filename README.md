@@ -149,7 +149,7 @@ If the program executes correctly, accuracies will be printed as follows. Please
 |  DenseNet121 (Keras)   | 0.750             |
 | MobileNet V2 (Keras)   | 0.713             |
 
-### Accuracies of the results combined by turth discovery
+### Accuracies of the results combined by truth discovery
 
 #### Results on MNIST (iteration = 20)
 | Noise         | 0      |        |        |            | 3      |        |        |            | 5      |        |        |            |
