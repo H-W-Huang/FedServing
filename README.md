@@ -82,7 +82,7 @@ We provide the ground truth files as well as the combined results used in our ex
 ``` bash
 python acc_utils.py
 ```
-If the program executes correctly, accuracies will be printed as follows.
+If the program executes correctly, accuracies will be printed as follows. Please refer to `acc_utils.py` for details.
 ```
 ============= MNIST =============
 > noise level is : 0
