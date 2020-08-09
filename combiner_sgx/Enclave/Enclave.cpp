@@ -113,16 +113,48 @@ double get_KL_divergence_distance(double *vec1, double *vec2, int size){
 }
 
 
-void update_weights(ModelInput *inputs, double outputs[QUERY_SIZE][CATEGORY_NUM], double (*loss_func)(double*,double*,int)){
-
-
+void update_weights_new(ModelInput *inputs, double outputs[QUERY_SIZE][CATEGORY_NUM], double (*loss_func)(double*,double*,int)){
     double old_weights[MODEL_NUM] = {0};
-
 
     for (int i = 0; i < MODEL_NUM; ++i) {
         old_weights[i] = inputs[i].weight;
     }
 
+    // double numerator[QUERY_SIZE] = {0};
+    // double denominators[QUERY_SIZE] = {0};
+
+    double numerators[MODEL_NUM] = {0};
+    double denominator = 0;
+    double distances[MODEL_NUM][QUERY_SIZE] = {0};
+    for (int i = 0; i < MODEL_NUM; ++i) {
+        for (int j = 0; j < QUERY_SIZE; ++j) {
+            distances[i][j] = loss_func(inputs[i].preds[j], outputs[j], CATEGORY_NUM);
+            numerators[i] += distances[i][j]; // numerator of a model is the sum of the losses across all the query(j)
+        }
+        denominator += numerators[i];
+    }
+
+    // update weights
+    for (int i = 0; i < MODEL_NUM; ++i) {
+        double temp = numerators[i] / denominator;
+        if( isnan(temp) || temp == 0 ){
+            inputs[i].weight = old_weights[i];
+        }else{
+            inputs[i].weight = -log(temp);
+        }
+    }
+    // normalize weights, do the softmax
+    softmax(inputs,MODEL_NUM);
+}
+
+
+
+void update_weights(ModelInput *inputs, double outputs[QUERY_SIZE][CATEGORY_NUM], double (*loss_func)(double*,double*,int)){
+    double old_weights[MODEL_NUM] = {0};
+
+    for (int i = 0; i < MODEL_NUM; ++i) {
+        old_weights[i] = inputs[i].weight;
+    }
 
     double denominators[QUERY_SIZE] = {0};
     double distances[MODEL_NUM][QUERY_SIZE] = {0};
@@ -148,11 +180,8 @@ void update_weights(ModelInput *inputs, double outputs[QUERY_SIZE][CATEGORY_NUM]
             inputs[i].weight = -log(temp);
         }
     }
-
     // normalize weights, do the softmax
     softmax(inputs,MODEL_NUM);
-
-
 }
 
 void softmax_2(double output[CATEGORY_NUM], int length) {
@@ -185,7 +214,8 @@ void turth_discovery(ModelInput *inputs, double outputs[QUERY_SIZE][CATEGORY_NUM
 
         // update weights
         // ocall_print("looping...");
-        update_weights(inputs,outputs, loss_func);
+        // update_weights(inputs,outputs, loss_func);
+        update_weights_new(inputs,outputs, loss_func);
         r += 1;
     }
 

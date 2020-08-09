@@ -136,222 +136,6 @@ void print_array(double *array, int size){
 
 
 
-
-
-
-int exp_mia(int is_shadow){
-    string prefix = "shadow";
-    if(!is_shadow){
-        prefix = "target";
-    }
-
-    int sum_result;
-    sgx_status_t status;
-  
-    /* Enclave Initialization */ 
-    if (initialize_enclave(&global_eid, "enclave.token", "enclave.signed.so") < 0) {
-        printf("Fail to initialize enclave.\n");
-        return 1;
-    }
-    // add your codes here
-    static ModelInput inputs[3];
-    static CombinerOutput output;
-
-    // MNIST
-    string model_results[3] = {
-        prefix+"_cnn_member.csv",    
-        prefix+"_mlp_member.csv",    
-        prefix+"_rnn_member.csv"
-    };
-
-    // string model_results[3] = {
-    //     prefix+"_cnn_non_member.csv",    
-    //     prefix+"_mlp_non_member.csv",    
-    //     prefix+"_rnn_non_member.csv"
-    // };
-
-
-    clock_t r_start,r_end;
-    r_start=clock();
-    for(int i=0; i< MODEL_NUM; ++i){
-        readResultsFromFiles("../image/mia/"+prefix+"_outputs/"+model_results[i],  inputs[i].preds, DATA_TYPE_DOUBLE);
-    }
-    r_end = clock();
-    cout << "Data reading takes " <<  double(r_end-r_start)/CLOCKS_PER_SEC << "s" << endl;
-
-    
-    clock_t start,end;
-    start=clock();
-    // use sgx to combine the results
-    status = combine_result(global_eid, &sum_result, inputs, &output);
-    end=clock();
-
-    if (status != SGX_SUCCESS) {
-        printf("ECall failed.\n");
-        return 1;
-    }
-
-    cout << "\nweights:" << endl;
-    for(int i=0; i< MODEL_NUM; ++i){
-        cout << "model "<< (i+1) <<":"<< inputs[i].weight << endl;
-    }
-
-    // print_array(output.preds[0], CATEGORY_NUM);
-    // print_array(inputs[0].preds[0], CATEGORY_NUM);
-
-    cout << "Combination takes " <<  double(end-start)/CLOCKS_PER_SEC << "s" << endl;
-    
-    if(DISTANCE == "KL"){
-        saveResults( "" TASK "_" STR(QUERY_SIZE) "_" OTYPE "_iter_" STR(ITERATION_NUM) "_dis_" DISTANCE "_.csv", output.preds);
-    }else{
-        saveResults( "../image/mia/"+prefix+"_combined_results/"+model_results[0], output.preds);
-    }
-
-    // cout.rdbuf(coutbuf);
-    return 0;
-}
-
-int exp_mia_adv2(){
-
-    int sum_result;
-    sgx_status_t status;
-  
-    /* Enclave Initialization */ 
-    if (initialize_enclave(&global_eid, "enclave.token", "enclave.signed.so") < 0) {
-        printf("Fail to initialize enclave.\n");
-        return 1;
-    }
-    // add your codes here
-    static ModelInput inputs[3];
-    static CombinerOutput output;
-
-
-    // string model_results[3] = {
-    //     "dnn_member.csv",    
-    //     "rnn_member.csv",    
-    //     "svm_member.csv"
-    // };
-
-    string model_results[3] = {
-        "dnn_non_member.csv",    
-        "rnn_non_member.csv",    
-        "svm_non_member.csv"
-    };
-
-
-    clock_t r_start,r_end;
-    r_start=clock();
-    for(int i=0; i< MODEL_NUM; ++i){
-        string f_path = "../image/mia/adv2/local_results/"+model_results[i] ;
-        cout << "read from :" << f_path << endl;
-        readResultsFromFiles(f_path,  inputs[i].preds, DATA_TYPE_DOUBLE);
-    }
-    r_end = clock();
-    cout << "Data reading takes " <<  double(r_end-r_start)/CLOCKS_PER_SEC << "s" << endl;
-
-    
-    clock_t start,end;
-    start=clock();
-    // use sgx to combine the results
-    status = combine_result(global_eid, &sum_result, inputs, &output);
-    end=clock();
-
-    if (status != SGX_SUCCESS) {
-        printf("ECall failed.\n");
-        return 1;
-    }
-
-    cout << "\nweights:" << endl;
-    for(int i=0; i< MODEL_NUM; ++i){
-        cout << "model "<< (i+1) <<":"<< inputs[i].weight << endl;
-    }
-
-    // print_array(output.preds[0], CATEGORY_NUM);
-    // print_array(inputs[0].preds[0], CATEGORY_NUM);
-
-    cout << "Combination takes " <<  double(end-start)/CLOCKS_PER_SEC << "s" << endl;
-    
-    if(DISTANCE == "KL"){
-        saveResults( "" TASK "_" STR(QUERY_SIZE) "_" OTYPE "_iter_" STR(ITERATION_NUM) "_dis_" DISTANCE "_.csv", output.preds);
-    }else{
-        saveResults( "../image/mia/adv2/combined_result/"+model_results[0], output.preds);
-    }
-
-    // cout.rdbuf(coutbuf);
-    return 0;
-}
-
-int exp_adv(string attack_method){
-    
-    cout << "attack:" << attack_method << endl;
-
-    int sum_result;
-    sgx_status_t status;
-  
-    /* Enclave Initialization */ 
-    if (initialize_enclave(&global_eid, "enclave.token", "enclave.signed.so") < 0) {
-        printf("Fail to initialize enclave.\n");
-        return 1;
-    }
-    // add your codes here
-    static ModelInput inputs[6];
-    static CombinerOutput output;
-
-    // MNIST
-    string model_results[6] = {
-        "cnn.csv",
-        "mlp.csv",
-        "rnn.csv",
-        "lr.csv" ,
-        "knn.csv",
-        "svm.csv"
-    };
-
-    clock_t r_start,r_end;
-    r_start=clock();
-    for(int i=0; i< MODEL_NUM; ++i){
-        string f_path = "../image/adv/adv_outputs/"+attack_method+"/"+model_results[i];
-        cout << "read from :" << f_path << endl;
-        readResultsFromFiles(f_path,  inputs[i].preds, DATA_TYPE_DOUBLE);
-        readResultsFromFiles(f_path,  inputs[i].preds, DATA_TYPE_DOUBLE);
-    }
-    r_end = clock();
-    cout << "Data reading takes " <<  double(r_end-r_start)/CLOCKS_PER_SEC << "s" << endl;
-
-    
-    clock_t start,end;
-    start=clock();
-    // use sgx to combine the results
-    status = combine_result(global_eid, &sum_result, inputs, &output);
-    end=clock();
-
-    if (status != SGX_SUCCESS) {
-        printf("ECall failed.\n");
-        return 1;
-    }
-
-    cout << "\nweights:" << endl;
-    for(int i=0; i< MODEL_NUM; ++i){
-        cout << "model "<< (i+1) <<":"<< inputs[i].weight << endl;
-    }
-
-    // print_array(output.preds[0], CATEGORY_NUM);
-    // print_array(inputs[0].preds[0], CATEGORY_NUM);
-
-    cout << "Combination takes " <<  double(end-start)/CLOCKS_PER_SEC << "s" << endl;
-    
-    if(DISTANCE == "KL"){
-        saveResults( "" TASK "_" STR(QUERY_SIZE) "_" OTYPE "_iter_" STR(ITERATION_NUM) "_dis_" DISTANCE "_.csv", output.preds);
-    }else{
-        saveResults( "../image/adv/adv_combined_results/"+attack_method+"/adv_combined.csv", output.preds);
-    }
-
-    // cout.rdbuf(coutbuf);
-    return 0;
-}
-
-
-
 int exp1(){
     int sum_result;
     sgx_status_t status;
@@ -380,40 +164,40 @@ int exp1(){
 
     cout << "Task:" << TASK << endl;
     if (TASK  == "MNIST"){
-        model_results[0] = "KNN.csv";    // 3,5
-        model_results[1] = "SVM.csv";    // 3,5
-        model_results[2] = "CNN.csv";    // 3,5
-        model_results[3] = "RNN.csv";    // 5
-        model_results[4] = "LR.csv" ;    // 5
+        model_results[0] = (NOISE_LEVEL == 3 or NOISE_LEVEL == 5) ? "KNN_noise.csv" : "KNN.csv";    // 3,5
+        model_results[1] = (NOISE_LEVEL == 3 or NOISE_LEVEL == 5) ? "SVM_noise.csv" : "SVM.csv";    // 3,5"SVM_noise.csv";    // 3,5
+        model_results[2] = (NOISE_LEVEL == 3 or NOISE_LEVEL == 5) ? "CNN_noise.csv" : "CNN.csv";    // 3,5"CNN_noise.csv";    // 3,5
+        model_results[3] = (NOISE_LEVEL == 5) ? "RNN_noise.csv" : "RNN.csv";    // 3,5"RNN_noise.csv";    // 5
+        model_results[4] = (NOISE_LEVEL == 5) ? "LR_noise.csv" : "LR.csv";    // 3,5 "LR_noise.csv" ;    // 5
         model_results[5] = "MLP.csv";
-    }else if(TASK  == "20New"){
+    }else if(TASK  == "20News"){
         // model_results[MODEL_NUM] = {
-        model_results[0] = "knn.csv";                  // 5,9
-        model_results[1] = "svm.csv";                  // 5,9
-        model_results[2] = "decision_tree.csv";        // 5,9
-        model_results[3] = "srandom_forest.csv";       // 5,9
-        model_results[4] = "bagging.csv";              // 5,9
-        model_results[5] = "boost.csv";                // 9
-        model_results[6] = "DNN.csv";                  // 9
-        model_results[7] = "CNN.csv";                  // 9
-        model_results[8] = "RNN.csv";                  // 9
+        model_results[0] = (NOISE_LEVEL ==  5 or NOISE_LEVEL == 9)? "knn_noise.csv"            : "knn.csv";                  // 5,9
+        model_results[1] = (NOISE_LEVEL ==  5 or NOISE_LEVEL == 9)? "svm_noise.csv"            : "svm.csv";                  // 5,9
+        model_results[2] = (NOISE_LEVEL ==  5 or NOISE_LEVEL == 9)? "decision_tree_noise.csv"  : "decision_tree.csv";        // 5,9
+        model_results[3] = (NOISE_LEVEL ==  5 or NOISE_LEVEL == 9)? "srandom_forest_noise.csv" : "srandom_forest.csv";       // 5,9
+        model_results[4] = (NOISE_LEVEL ==  5 or NOISE_LEVEL == 9)? "bagging_noise.csv"        : "bagging.csv";              // 5,9
+        model_results[5] = (NOISE_LEVEL == 9)? "boost_noise.csv" : "boost.csv";                // 9
+        model_results[6] = (NOISE_LEVEL == 9)? "DNN_noise.csv"   : "DNN.csv";                  // 9
+        model_results[7] = (NOISE_LEVEL == 9)? "CNN_noise.csv"   : "CNN.csv";                  // 9
+        model_results[8] = (NOISE_LEVEL == 9)? "RNN_noise.csv"   : "RNN.csv";                  // 9
         model_results[9] = "RCNN.csv";                
         // }
     }else if( TASK == "ImageNet"){
-         model_results[0] = "pytorch_AlexNet.csv";        // 7,14
-         model_results[1] = "pytorch_DenseNet.csv";       // 7,14    
-         model_results[2] = "pytorch_GoogLenet.csv";      // 7,14
-         model_results[3] = "pytorch_InceptionV3.csv";    // 7,14
-         model_results[4] = "pytorch_MobileNetV2.csv";    // 7,14
-         model_results[5] = "pytorch_ResNet101.csv";      // 7,14 
-         model_results[6] = "pytorch_ResNet50.csv";       // 7,14
-         model_results[7] = "pytorch_VGG16.csv";          // 14
-         model_results[8] = "pytorch_VGG19.csv";          // 14
-         model_results[9] = "keras_DenseNet.csv";         // 14
-         model_results[10] = "keras_InceptionV3.csv";     // 14
-         model_results[11] = "keras_MobileNetV2.csv";     // 14
-         model_results[12] = "keras_ResNet50.csv";        // 14
-         model_results[13] = "keras_VGG16.csv";           // 14
+         model_results[0]  = (NOISE_LEVEL == 7 or  NOISE_LEVEL == 14) ? "pytorch_AlexNet_noise.csv"    : "pytorch_AlexNet.csv";        // 7,14
+         model_results[1]  = (NOISE_LEVEL == 7 or  NOISE_LEVEL == 14) ? "pytorch_DenseNet_noise.csv"   : "pytorch_DenseNet.csv";       // 7,14    
+         model_results[2]  = (NOISE_LEVEL == 7 or  NOISE_LEVEL == 14) ? "pytorch_GoogLenet_noise.csv"  : "pytorch_GoogLenet.csv";      // 7,14
+         model_results[3]  = (NOISE_LEVEL == 7 or  NOISE_LEVEL == 14) ? "pytorch_InceptionV3_noise.csv": "pytorch_InceptionV3.csv";    // 7,14
+         model_results[4]  = (NOISE_LEVEL == 7 or  NOISE_LEVEL == 14) ? "pytorch_MobileNetV2_noise.csv": "pytorch_MobileNetV2.csv";    // 7,14
+         model_results[5]  = (NOISE_LEVEL == 7 or  NOISE_LEVEL == 14) ? "pytorch_ResNet101_noise.csv"  : "pytorch_ResNet101.csv";      // 7,14 
+         model_results[6]  = (NOISE_LEVEL == 7 or  NOISE_LEVEL == 14) ? "pytorch_ResNet50_noise.csv"   : "pytorch_ResNet50.csv";       // 7,14
+         model_results[7]  = (NOISE_LEVEL == 14) ? "pytorch_VGG16_noise.csv"      : "pytorch_VGG16.csv";          // 14
+         model_results[8]  = (NOISE_LEVEL == 14) ? "pytorch_VGG19_noise.csv"      : "pytorch_VGG19.csv";          // 14
+         model_results[9]  = (NOISE_LEVEL == 14) ? "keras_DenseNet_noise.csv"     : "keras_DenseNet.csv";         // 14
+         model_results[10] = (NOISE_LEVEL == 14) ? "keras_InceptionV3_noise.csv"  : "keras_InceptionV3.csv";     // 14
+         model_results[11] = (NOISE_LEVEL == 14) ? "keras_MobileNetV2_noise.csv"  : "keras_MobileNetV2.csv";     // 14
+         model_results[12] = (NOISE_LEVEL == 14) ? "keras_ResNet50_noise.csv"     : "keras_ResNet50.csv";        // 14
+         model_results[13] = (NOISE_LEVEL == 14) ? "keras_VGG16_noise.csv"        : "keras_VGG16.csv";           // 14
          model_results[14] = "keras_VGG19.csv";
     }
 
@@ -439,10 +223,10 @@ int exp1(){
         return 1;
     }
 
-    // cout << "\nweights:" << endl;
-    // for(int i=0; i< MODEL_NUM; ++i){
-    //     cout << "model "<< (i+1) <<":"<< inputs[i].weight << endl;
-    // }
+    cout << "\nweights:" << endl;
+    for(int i=0; i< MODEL_NUM; ++i){
+        cout << "model "<< (i+1) <<":"<< inputs[i].weight << endl;
+    }
 
     cout << "Combination takes " <<  double(end-start)/CLOCKS_PER_SEC << "s" << endl;
     
@@ -462,11 +246,5 @@ int exp1(){
 
 int main(int argc, char const *argv[]) {
     exp1();
-
-    // exp for attacks
-    // int is_shadow = 0;
-    // exp_mia(is_shadow);
-    // exp_mia_adv2();
-    // exp_adv("cw");
     return 0;
 }

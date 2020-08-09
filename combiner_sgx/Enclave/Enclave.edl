@@ -5,7 +5,7 @@ enclave {
         /* define ECALLs here. */
 
 		// very simple function - adding 2 numbers
-		public int combine_result([user_check] ModelInput *input, [out] CombinerOutput *output);
+		public int combine_result([user_check] ModelInput *input, [user_check] CombinerOutput *output);
 
 	
 		// write to file
