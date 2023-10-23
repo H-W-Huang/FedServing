@@ -177,3 +177,9 @@ If the program executes correctly, accuracies will be printed as follows. Please
 | 16000         | 0.790  | 0.764  | 0.789  | 0.766  | 0.071  | 0.768  | 0.010  | 0.004  | 0.288  |
 
 
+### 项目声明 Project Statement
+本项目的作者及及单位
+The auther and affiliation of this project
+> 项目名称（Project Name）:FedServing
+> 项目作者（Auther）：Hongwei Huang、Jiasi Weng
+> 作者单位（Affiliation）：暨南大学网络空间安全学院（College of Cyber Sercurity, Jinan University）
